@@ -1,1 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Home Kitchen</title>
+    <style>
+        :root {
+            --primary-color: #2e7d32; /* Easy on the eyes green */
+            --bg-color: #ffffff;
+            --text-color: #212121;
+            --card-bg: #f9f9f9;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 20px; /* Large base font for accessibility */
+        }
+
+        header { text-align: center; padding: 20px 0; border-bottom: 2px solid #eee; }
+        h1 { margin: 0; color: var(--primary-color); font-size: 2rem; }
+
+        /* Search Section */
+        .search-container {
+            margin: 25px 0;
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        label { display: block; font-weight: bold; margin-bottom: 10px; }
+
+        input, select {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            font-size: 18px;
+            box-sizing: border-box; /* Ensures padding doesn't break width */
+        }
+
+        /* Recipe Cards */
+        .recipe-list {
+            display: grid;
+            grid-template-columns: 1fr; /* Stacked for mobile */
+            gap: 20px;
+        }
+
+        .recipe-card {
+            background: var(--card-bg);
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .recipe-card h2 { margin-top: 0; color: var(--primary-color); }
+        .tag {
+            display: inline-block;
+            background: #ddd;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        .ingredients-list { font-size: 18px; line-height: 1.6; }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Grandpa's Recipes</h1>
+</header>
+
+<div class="search-container">
+    <label for="fridgeSearch">🛒 What's in your fridge?</label>
+    <input type="text" id="fridgeSearch" placeholder="Type an ingredient (e.g. Chicken)..." onkeyup="filterRecipes()">
+
+    <label for="methodSelect">🍳 Cooking Method</label>
+    <select id="methodSelect" onchange="filterRecipes()">
+        <option value="">All Methods</option>
+        <option value="Stir-fry">Stir-fry</option>
+        <option value="Soup">Soup</option>
+        <option value="Steam">Steam</option>
+        <option value="Bake">Bake</option>
+    </select>
+</div>
+
+<div id="recipeList" class="recipe-list">
+    <!-- Recipes will appear here automatically -->
+</div>
+
+<script>
+    // DATA BASE: ADD YOUR RECIPES HERE
+    const myRecipes = [
+        {
+            name: "Tomato & Egg Stir-fry",
+            ingredients: ["egg", "tomato", "green onion"],
+            method: "Stir-fry",
+            time: "10 mins",
+            instructions: "Whisk eggs, scramble in pan, add chopped tomatoes until soft."
+        },
+        {
+            name: "Garlic Steamed Fish",
+            ingredients: ["fish", "garlic", "soy sauce", "ginger"],
+            method: "Steam",
+            time: "15 mins",
+            instructions: "Place ginger on fish, steam for 8 mins, pour hot garlic soy sauce over top."
+        },
+        {
+            name: "Simple Chicken Soup",
+            ingredients: ["chicken", "carrot", "corn", "ginger"],
+            method: "Soup",
+            time: "60 mins",
+            instructions: "Boil all ingredients on low heat for an hour."
+        }
+    ];
+
+    function displayRecipes(data) {
+        const container = document.getElementById('recipeList');
+        container.innerHTML = '';
+
+        data.forEach(recipe => {
+            const card = document.createElement('div');
+            card.className = 'recipe-card';
+            card.innerHTML = `
+                <h2>${recipe.name}</h2>
+                <span class="tag">⏱ ${recipe.time}</span>
+                <span class="tag">🔥 ${recipe.method}</span>
+                <p class="ingredients-list"><strong>Ingredients:</strong> ${recipe.ingredients.join(', ')}</p>
+                <p><strong>How to cook:</strong><br>${recipe.instructions}</p>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function filterRecipes() {
+        const searchText = document.getElementById('fridgeSearch').value.toLowerCase();
+        const selectedMethod = document.getElementById('methodSelect').value;
+
+        const filtered = myRecipes.filter(recipe => {
+            const matchesIngredient = recipe.ingredients.some(ing => ing.toLowerCase().includes(searchText)) || recipe.name.toLowerCase().includes(searchText);
+            const matchesMethod = selectedMethod === "" || recipe.method === selectedMethod;
+            
+            return matchesIngredient && matchesMethod;
+        });
+
+        displayRecipes(filtered);
+    }
+
+    // Initial load
+    displayRecipes(myRecipes);
+</script>
+
+</body>
+</html>
