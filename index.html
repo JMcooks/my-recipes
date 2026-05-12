@@ -81,6 +81,18 @@
     <label for="fridgeSearch">🛒 你的雪櫃有什麼食材？</label>
     <input type="text" id="fridgeSearch" placeholder="輸入食材 (例如：雞蛋)..." onkeyup="filterRecipes()">
 
+    <label for="cuisineSelect">🌏 菜系選擇</label>
+    <select id="cuisineSelect" onchange="filterRecipes()">
+        <option value="">全部菜系</option>
+        <option value="中菜">中菜 (Chinese)</option>
+        <option value="泰國菜">泰國菜 (Thai)</option>
+        <option value="越南菜">越南菜 (Viet)</option>
+        <option value="日本菜">日本菜 (Japanese)</option>
+        <option value="韓國菜">韓國菜 (Korean)</option>
+        <option value="西式">西式 (Western)</option>
+        <option value="多國菜">多國菜 (Fusion)</option>
+    </select>
+    
     <label for="methodSelect">🍳 烹飪方法</label>
     <select id="methodSelect" onchange="filterRecipes()">
         <option value="">全部方法</option>
@@ -99,21 +111,27 @@
 </div>
 
 <script>
-    // 數據庫：在這裡添加你的食譜
+    // 數據庫：在這裡添加你的食譜資料
     const myRecipes = [
         {
             name: "番茄炒蛋",
+            image: "tomato-egg.jpg",
+            cuisine: "廣東菜",
             ingredients: ["雞蛋", "番茄", "蔥"],
             method: "炒",
             time: "10 分鐘",
+            youtube: "https://www.youtube.com/results?search_query=番茄炒蛋", // 放入具體的影片網址
             instructions: "先炒熟雞蛋盛起，再煮軟番茄，最後加入雞蛋拌勻。"
         },
         {
-            name: "蒜蓉蒸魚",
-            ingredients: ["魚", "蒜蓉", "豉油", "薑"],
-            method: "蒸",
-            time: "15 分鐘",
-            instructions: "魚身鋪上薑絲，蒸8分鐘，淋上蒜蓉熟油及豉油。"
+            name: "泰式冬蔭功湯",
+            image: "tom-yum.jpg",
+            cuisine: "泰國菜",
+            ingredients: ["蝦", "香茅", "青檸", "辣椒"],
+            method: "湯",
+            time: "30 分鐘",
+            youtube: "https://www.youtube.com/results?search_query=冬蔭功",
+            instructions: "將香料煮滾出味，加入蝦及調味料，最後下青檸汁。"
         }
     ];
 
@@ -122,19 +140,29 @@
         container.innerHTML = '';
 
         if(data.length === 0) {
-            container.innerHTML = '<p style="text-align:center;">找不到相關食譜，試試其他食材吧！</p>';
+            container.innerHTML = '<p style="text-align:center; padding: 20px;">找不到相關食譜，試試其他搜尋條件吧！</p>';
             return;
         }
 
         data.forEach(recipe => {
             const card = document.createElement('div');
             card.className = 'recipe-card';
+            
+            const imageSrc = recipe.image ? recipe.image : "https://via.placeholder.com/400x220?text=無圖片";
+
             card.innerHTML = `
-                <h2>${recipe.name}</h2>
-                <span class="tag">⏱ ${recipe.time}</span>
-                <span class="tag">🔥 ${recipe.method}</span>
-                <p class="ingredients-list"><strong>材料：</strong> ${recipe.ingredients.join('、')}</p>
-                <p><strong>煮法：</strong><br>${recipe.instructions}</p>
+                <img src="${imageSrc}" alt="${recipe.name}" class="recipe-img">
+                <div class="recipe-content">
+                    <h2>${recipe.name}</h2>
+                    <div class="tag-group">
+                        <span class="tag cuisine">🌏 ${recipe.cuisine}</span>
+                        <span class="tag">⏱ ${recipe.time}</span>
+                        <span class="tag">🔥 ${recipe.method}</span>
+                    </div>
+                    <p class="ingredients-list"><strong>材料：</strong> ${recipe.ingredients.join('、')}</p>
+                    <p><strong>煮法：</strong><br>${recipe.instructions}</p>
+                    ${recipe.youtube ? `<a href="${recipe.youtube}" target="_blank" class="yt-button">▶ 觀看 YouTube 教學影片</a>` : ''}
+                </div>
             `;
             container.appendChild(card);
         });
@@ -142,17 +170,21 @@
 
     function filterRecipes() {
         const searchText = document.getElementById('fridgeSearch').value.toLowerCase();
+        const selectedCuisine = document.getElementById('cuisineSelect').value;
         const selectedMethod = document.getElementById('methodSelect').value;
 
         const filtered = myRecipes.filter(recipe => {
             const matchesIngredient = recipe.ingredients.some(ing => ing.includes(searchText)) || recipe.name.includes(searchText);
+            const matchesCuisine = selectedCuisine === "" || recipe.cuisine === selectedCuisine;
             const matchesMethod = selectedMethod === "" || recipe.method === selectedMethod;
-            return matchesIngredient && matchesMethod;
+            
+            return matchesIngredient && matchesCuisine && matchesMethod;
         });
 
         displayRecipes(filtered);
     }
 
+    // 初始載入
     displayRecipes(myRecipes);
 </script>
 
